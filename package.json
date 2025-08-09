@@ -1,0 +1,24 @@
+{
+  "name": "auralis",
+  "version": "0.1.0",
+  "description": "Auralis is a powerful audio processing library.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev:run": "node ./dist/main.js",
+    "dev": "run-s build dev:run",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Christopher Quadflieg",
+    "email": "chrissi92@hotmail.de",
+    "url": "https://github.com/Shinigami92"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "24.2.1",
+    "npm-run-all2": "8.0.4",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@10.14.0"
+}
