@@ -1,5 +1,6 @@
 import type { UUID } from "node:crypto";
 import { randomUUID } from "node:crypto";
+import { Delete } from "../common/delete.decorator.ts";
 import { Get } from "../common/get.decorator.ts";
 import { NotFoundResponseError } from "../common/not-found-response.error.ts";
 import { PathVariable } from "../common/path-variable.decorator.ts";
@@ -44,5 +45,15 @@ export class CatController {
     }
     cats[index] = cat;
     return cat;
+  }
+
+  @Delete
+  @Path("/:id")
+  public delete(@PathVariable() id: UUID): void {
+    const index = cats.findIndex((c) => c.id === id);
+    if (index === -1) {
+      throw new NotFoundResponseError("Cat not found");
+    }
+    cats.splice(index, 1);
   }
 }

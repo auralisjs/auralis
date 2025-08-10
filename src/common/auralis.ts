@@ -18,7 +18,7 @@ export class Auralis {
         Function,
         {
           name?: string;
-          method?: "GET" | "POST" | "PUT";
+          method?: "GET" | "POST" | "PUT" | "DELETE";
           path?: string;
           pathVariables?: Map<
             string,
@@ -40,7 +40,7 @@ export class Auralis {
   #handlers: Array<{
     fn: Function;
     name: string;
-    method: "GET" | "POST" | "PUT";
+    method: "GET" | "POST" | "PUT" | "DELETE";
     path: string;
     pathVariables?: Map<
       string,
@@ -178,7 +178,11 @@ export class Auralis {
 
           const responseBody = handlerRef.fn(...parametersForHandler);
           res.setHeader("Content-Type", "application/json");
-          res.write(JSON.stringify(responseBody));
+          if (responseBody) {
+            res.write(JSON.stringify(responseBody));
+          } else {
+            res.statusCode = 204;
+          }
         } else {
           const notFoundResponse = new NotFoundResponseError(
             `No handler found for ${req.method} ${req.url}`
