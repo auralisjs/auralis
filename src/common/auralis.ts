@@ -2,7 +2,9 @@ import { glob } from "fs/promises";
 import { createServer, IncomingMessage } from "http";
 import { resolve } from "path";
 import { pathToFileURL } from "url";
+import { AuralisResponseError } from "./auralis-response.error.ts";
 import type { Constructor } from "./constructor.util.ts";
+import { InternalServerError } from "./internal-server-response.error.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
@@ -15,7 +17,7 @@ export class Auralis {
         Function,
         {
           name?: string;
-          method?: "GET" | "POST";
+          method?: "GET" | "POST" | "PUT";
           path?: string;
           pathVariables?: Map<
             string,
@@ -37,7 +39,7 @@ export class Auralis {
   #handlers: Array<{
     fn: Function;
     name: string;
-    method: "GET" | "POST";
+    method: "GET" | "POST" | "PUT";
     path: string;
     pathVariables?: Map<
       string,
@@ -179,9 +181,14 @@ export class Auralis {
         }
       } catch (error) {
         console.error("[Auralis]: Error handling request", error);
-        res.statusCode = 500;
-        res.setHeader("Content-Type", "application/json");
-        res.write(JSON.stringify({ error: "Internal Server Error" }));
+
+        if (error instanceof AuralisResponseError) {
+          error.handle(res);
+        } else {
+          const internalServerError = new InternalServerError();
+          internalServerError.cause = error;
+          internalServerError.handle(res);
+        }
       }
 
       res.end();
