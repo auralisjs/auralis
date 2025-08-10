@@ -2,6 +2,7 @@ import { glob } from "fs/promises";
 import { createServer, IncomingMessage } from "http";
 import { resolve } from "path";
 import { pathToFileURL } from "url";
+import type { Constructor } from "./constructor.util.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
@@ -14,7 +15,7 @@ export class Auralis {
         Function,
         {
           name?: string;
-          method?: "GET";
+          method?: "GET" | "POST";
           path?: string;
           pathVariables?: Map<
             string,
@@ -23,6 +24,11 @@ export class Auralis {
               index: number;
             }
           >;
+          requestBody?: {
+            paramName: string;
+            type: Constructor;
+            index: number;
+          };
         }
       >;
     }
@@ -31,7 +37,7 @@ export class Auralis {
   #handlers: Array<{
     fn: Function;
     name: string;
-    method: "GET";
+    method: "GET" | "POST";
     path: string;
     pathVariables?: Map<
       string,
@@ -40,6 +46,11 @@ export class Auralis {
         index: number;
       }
     >;
+    requestBody?: {
+      paramName: string;
+      type: Constructor;
+      index: number;
+    };
   }> = [];
 
   async initialize() {
@@ -101,49 +112,76 @@ export class Auralis {
           method: handlerMetadata.method,
           path: controllerMetadata.path + handlerMetadata.path,
           pathVariables: handlerMetadata.pathVariables,
+          requestBody: handlerMetadata.requestBody,
         });
       }
     }
   }
 
   async listen(port: number) {
-    const server = createServer((req, res) => {
+    const server = createServer(async (req, res) => {
       console.log("Request received:", req.method, req.url);
 
-      const handlerRef = this.#handlers.find(
-        (handler) =>
-          handler.method === req.method && pathMatches(handler.path, req)
-      );
+      try {
+        const handlerRef = this.#handlers.find(
+          (handler) =>
+            handler.method === req.method && pathMatches(handler.path, req)
+        );
 
-      if (handlerRef) {
-        console.log("[Auralis]: Found handler for", req.url, handlerRef);
+        if (handlerRef) {
+          console.log("[Auralis]: Found handler for", req.url, handlerRef);
 
-        const parametersForHandler: any[] = [];
+          const parametersForHandler: any[] = [];
 
-        if (handlerRef.pathVariables) {
-          const regexPattern = handlerRef.path.replace(
-            /:(\w+)/g,
-            (_, name) => `(?<${name}>[^/]+)`
-          );
-          const regex = new RegExp(regexPattern);
-          const match = regex.exec(req.url!);
+          // Extract path variables if they exist
+          if (handlerRef.pathVariables) {
+            const regexPattern = handlerRef.path.replace(
+              /:(\w+)/g,
+              (_, name) => `(?<${name}>[^/]+)`
+            );
+            const regex = new RegExp(regexPattern);
+            const match = regex.exec(req.url!);
 
-          if (match) {
-            console.log("[Auralis]: Extracted path variables", match);
+            if (match) {
+              console.log("[Auralis]: Extracted path variables", match);
 
-            for (const [
-              pathVariableName,
-              pathVariableRef,
-            ] of handlerRef.pathVariables) {
-              parametersForHandler[pathVariableRef.index] =
-                pathVariableRef.type(match.groups![pathVariableName]);
+              for (const [
+                pathVariableName,
+                pathVariableRef,
+              ] of handlerRef.pathVariables) {
+                parametersForHandler[pathVariableRef.index] =
+                  pathVariableRef.type(match.groups![pathVariableName]);
+              }
             }
           }
-        }
 
-        const responseBody = handlerRef.fn(...parametersForHandler);
+          // Extract request body if it exists
+          if (handlerRef.requestBody) {
+            const { type, index } = handlerRef.requestBody;
+
+            const rawBody = await new Promise<string>((resolve) => {
+              let data = "";
+              req
+                .on("data", (chunk) => {
+                  data += chunk;
+                })
+                .on("end", () => {
+                  resolve(data);
+                });
+            });
+
+            parametersForHandler[index] = new type(JSON.parse(rawBody));
+          }
+
+          const responseBody = handlerRef.fn(...parametersForHandler);
+          res.setHeader("Content-Type", "application/json");
+          res.write(JSON.stringify(responseBody));
+        }
+      } catch (error) {
+        console.error("[Auralis]: Error handling request", error);
+        res.statusCode = 500;
         res.setHeader("Content-Type", "application/json");
-        res.write(JSON.stringify(responseBody));
+        res.write(JSON.stringify({ error: "Internal Server Error" }));
       }
 
       res.end();
