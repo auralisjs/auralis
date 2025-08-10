@@ -5,6 +5,7 @@ import { pathToFileURL } from "url";
 import { AuralisResponseError } from "./auralis-response.error.ts";
 import type { Constructor } from "./constructor.util.ts";
 import { InternalServerError } from "./internal-server-response.error.ts";
+import { NotFoundResponseError } from "./not-found-response.error.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
@@ -178,6 +179,11 @@ export class Auralis {
           const responseBody = handlerRef.fn(...parametersForHandler);
           res.setHeader("Content-Type", "application/json");
           res.write(JSON.stringify(responseBody));
+        } else {
+          const notFoundResponse = new NotFoundResponseError(
+            `No handler found for ${req.method} ${req.url}`
+          );
+          notFoundResponse.handle(res);
         }
       } catch (error) {
         console.error("[Auralis]: Error handling request", error);
