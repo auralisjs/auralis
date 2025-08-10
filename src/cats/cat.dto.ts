@@ -1,5 +1,7 @@
+import type { UUID } from "node:crypto";
+
 export class Cat {
-  id!: string;
+  id!: UUID;
 
   name!: string;
 
