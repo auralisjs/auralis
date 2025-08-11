@@ -14,12 +14,14 @@ export class Auralis {
     Function,
     {
       path?: string;
+      responseHeaders?: Record<string, string>;
       handlers?: Map<
         Function,
         {
           name?: string;
           method?: "GET" | "POST" | "PUT" | "DELETE";
           path?: string;
+          responseHeaders?: Record<string, string>;
           pathVariables?: Map<
             string,
             {
@@ -42,6 +44,7 @@ export class Auralis {
     name: string;
     method: "GET" | "POST" | "PUT" | "DELETE";
     path: string;
+    responseHeaders?: Record<string, string>;
     pathVariables?: Map<
       string,
       {
@@ -114,6 +117,10 @@ export class Auralis {
           name: handlerMetadata.name,
           method: handlerMetadata.method,
           path: controllerMetadata.path + handlerMetadata.path,
+          responseHeaders: {
+            ...controllerMetadata.responseHeaders,
+            ...handlerMetadata.responseHeaders,
+          },
           pathVariables: handlerMetadata.pathVariables,
           requestBody: handlerMetadata.requestBody,
         });
@@ -176,8 +183,15 @@ export class Auralis {
             parametersForHandler[index] = new type(JSON.parse(rawBody));
           }
 
+          if (handlerRef.responseHeaders) {
+            for (const [name, value] of Object.entries(
+              handlerRef.responseHeaders
+            )) {
+              res.setHeader(name, value);
+            }
+          }
+
           const responseBody = handlerRef.fn(...parametersForHandler);
-          res.setHeader("Content-Type", "application/json");
           if (responseBody) {
             res.write(JSON.stringify(responseBody));
           } else {

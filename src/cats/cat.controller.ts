@@ -8,13 +8,14 @@ import { Path } from "../common/path.decorator.ts";
 import { Post } from "../common/post.decorator.ts";
 import { Put } from "../common/put.decorator.ts";
 import { RequestBody } from "../common/request-body.decorator.ts";
+import { RestController } from "../common/rest-controller.decorator.ts";
 import { Cat } from "./cat.dto.ts";
 
 const cats: Cat[] = [
   new Cat({ id: "1aefd497-bb47-47e3-b160-cb69c5ba0ff4", name: "Kami", age: 4 }),
 ];
 
-@Path("/cats")
+@RestController("/cats")
 export class CatController {
   @Get
   @Path("/")
