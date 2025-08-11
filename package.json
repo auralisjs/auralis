@@ -1,24 +1,38 @@
 {
-  "name": "auralis",
+  "name": "auralis-monorepo",
   "version": "0.1.0",
-  "description": "Auralis is a powerful audio processing library.",
-  "type": "module",
+  "description": "Monorepo for Auralis packages",
   "scripts": {
-    "build": "tsc",
-    "dev:run": "node ./dist/main.js",
-    "dev": "run-s build dev:run",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "git clean -fdx",
+    "build": "pnpm -r build",
+    "example:cat-rest-api": "pnpm --filter cat-rest-api-example run dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ts-check": "tsc && pnpm -r ts-check",
+    "preflight": "pnpm install && run-s build ts-check"
   },
+  "private": true,
+  "homepage": "https://github.com/auralisjs/auralis",
+  "bugs": {
+    "url": "https://github.com/auralisjs/auralis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/auralisjs/auralis.git"
+  },
+  "license": "MIT",
   "author": {
     "name": "Christopher Quadflieg",
     "email": "chrissi92@hotmail.de",
     "url": "https://github.com/Shinigami92"
   },
-  "license": "MIT",
+  "type": "module",
   "devDependencies": {
     "@types/node": "24.2.1",
     "npm-run-all2": "8.0.4",
     "typescript": "5.9.2"
   },
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.14.0",
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

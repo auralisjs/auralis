@@ -1,6 +1,6 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "./auralis.ts";
+import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 
-export const Get: MethodDecorator = (target, propertyKey, descriptor) => {
+export const Post: MethodDecorator = (target, propertyKey, descriptor) => {
   const controller = target.constructor;
   const fn = descriptor.value as Function;
 
@@ -16,9 +16,9 @@ export const Get: MethodDecorator = (target, propertyKey, descriptor) => {
   }
 
   const handlerRef = controllerRef.handlers.get(fn)!;
-  handlerRef.method = "GET";
+  handlerRef.method = "POST";
 
-  console.log("[Get]:", {
+  console.log("[Post]:", {
     owningClass: controller,
     propertyKey,
     fn,

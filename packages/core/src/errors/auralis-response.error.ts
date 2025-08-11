@@ -1,4 +1,4 @@
-import type { ServerResponse, IncomingMessage } from "http";
+import type { ServerResponse, IncomingMessage } from "node:http";
 
 export abstract class AuralisResponseError extends Error {
   statusCode: number;

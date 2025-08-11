@@ -1,4 +1,4 @@
-import { AuralisFactory } from "./common/auralis.factory.ts";
+import { AuralisFactory } from "@auralis/core";
 
 async function bootstrap() {
   const app = await AuralisFactory.create();

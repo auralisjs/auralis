@@ -1,4 +1,4 @@
-import { Auralis } from "./auralis.ts";
+import { Auralis } from "../auralis.ts";
 
 export class AuralisFactory {
   static async create(): Promise<Auralis> {

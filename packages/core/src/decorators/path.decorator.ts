@@ -1,4 +1,4 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "./auralis.ts";
+import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 
 export function Path(path: string): MethodDecorator {
   return function (target, propertyKey, descriptor) {

@@ -1,0 +1,17 @@
+{
+  "name": "cat-rest-api-example",
+  "version": "0.1.0",
+  "description": "A cat example REST API",
+  "scripts": {
+    "build": "tsc",
+    "dev:run": "node ./dist/main.js",
+    "dev": "run-s build dev:run",
+    "ts-check": "tsc --noEmit"
+  },
+  "private": true,
+  "type": "module",
+  "module": "./dist/main.js",
+  "dependencies": {
+    "@auralis/core": "workspace:*"
+  }
+}

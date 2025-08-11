@@ -1,7 +1,8 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "./auralis.ts";
-import { getParamNames } from "./param-names.util.ts";
+import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
+import type { Constructor } from "../utilities/constructor.util.ts";
+import { getParamNames } from "../utilities/param-names.util.ts";
 
-export function PathVariable(type = String): ParameterDecorator {
+export function RequestBody(type: Constructor): ParameterDecorator {
   return function (target, propertyKey, parameterIndex) {
     const controller = target.constructor;
 
@@ -22,10 +23,13 @@ export function PathVariable(type = String): ParameterDecorator {
     }
 
     const handlerRef = controllerRef.handlers.get(fn)!;
-    handlerRef.pathVariables ??= new Map();
-    handlerRef.pathVariables.set(paramName, { type, index: parameterIndex });
+    handlerRef.requestBody = {
+      paramName,
+      type,
+      index: parameterIndex,
+    };
 
-    console.log("[PathVariable]:", {
+    console.log("[RequestBody]:", {
       owningClass: controller,
       propertyKey,
       parameterIndex,

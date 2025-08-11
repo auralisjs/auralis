@@ -1,4 +1,4 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "./auralis.ts";
+import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 
 export function RestController(path: string): ClassDecorator {
   return function (target) {

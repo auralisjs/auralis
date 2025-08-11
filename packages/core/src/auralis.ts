@@ -2,10 +2,10 @@ import { glob } from "fs/promises";
 import { createServer, IncomingMessage } from "http";
 import { resolve } from "path";
 import { pathToFileURL } from "url";
-import { AuralisResponseError } from "./auralis-response.error.ts";
-import type { Constructor } from "./constructor.util.ts";
-import { InternalServerError } from "./internal-server-response.error.ts";
-import { NotFoundResponseError } from "./not-found-response.error.ts";
+import { AuralisResponseError } from "./errors/auralis-response.error.ts";
+import { InternalServerError } from "./errors/internal-server-response.error.ts";
+import { NotFoundResponseError } from "./errors/not-found-response.error.ts";
+import type { Constructor } from "./utilities/constructor.util.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 

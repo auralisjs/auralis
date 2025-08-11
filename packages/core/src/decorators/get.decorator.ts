@@ -1,6 +1,6 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "./auralis.ts";
+import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 
-export const Delete: MethodDecorator = (target, propertyKey, descriptor) => {
+export const Get: MethodDecorator = (target, propertyKey, descriptor) => {
   const controller = target.constructor;
   const fn = descriptor.value as Function;
 
@@ -16,9 +16,9 @@ export const Delete: MethodDecorator = (target, propertyKey, descriptor) => {
   }
 
   const handlerRef = controllerRef.handlers.get(fn)!;
-  handlerRef.method = "DELETE";
+  handlerRef.method = "GET";
 
-  console.log("[Delete]:", {
+  console.log("[Get]:", {
     owningClass: controller,
     propertyKey,
     fn,

@@ -1,14 +1,16 @@
+import {
+  Delete,
+  Get,
+  NotFoundResponseError,
+  Path,
+  PathVariable,
+  Post,
+  Put,
+  RequestBody,
+  RestController,
+} from "@auralis/core";
 import type { UUID } from "node:crypto";
 import { randomUUID } from "node:crypto";
-import { Delete } from "../common/delete.decorator.ts";
-import { Get } from "../common/get.decorator.ts";
-import { NotFoundResponseError } from "../common/not-found-response.error.ts";
-import { PathVariable } from "../common/path-variable.decorator.ts";
-import { Path } from "../common/path.decorator.ts";
-import { Post } from "../common/post.decorator.ts";
-import { Put } from "../common/put.decorator.ts";
-import { RequestBody } from "../common/request-body.decorator.ts";
-import { RestController } from "../common/rest-controller.decorator.ts";
 import { Cat } from "./cat.dto.ts";
 
 const cats: Cat[] = [
