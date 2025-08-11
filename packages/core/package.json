@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Core package for Auralis framework",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "ts-check": "tsc --noEmit"
   },
   "homepage": "https://github.com/auralisjs/auralis/tree/main/packages/core",
   "bugs": {
