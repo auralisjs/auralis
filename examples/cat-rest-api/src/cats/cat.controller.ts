@@ -46,6 +46,7 @@ export class CatController {
     if (index === -1) {
       throw new NotFoundResponseError("Cat not found");
     }
+
     cats[index] = cat;
     return cat;
   }
@@ -57,6 +58,7 @@ export class CatController {
     if (index === -1) {
       throw new NotFoundResponseError("Cat not found");
     }
+
     cats.splice(index, 1);
   }
 }

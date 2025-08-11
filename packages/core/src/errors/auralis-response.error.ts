@@ -8,9 +8,7 @@ export abstract class AuralisResponseError extends Error {
     this.statusCode = statusCode;
   }
 
-  handle(
-    res: ServerResponse<IncomingMessage> & { req: IncomingMessage }
-  ): void {
+  handle(res: ServerResponse & { req: IncomingMessage }): void {
     res.statusCode = this.statusCode;
     res.setHeader("Content-Type", "application/json");
     res.write(

@@ -1,7 +1,8 @@
-import { glob } from "fs/promises";
-import { createServer, IncomingMessage } from "http";
-import { resolve } from "path";
-import { pathToFileURL } from "url";
+import { glob } from "node:fs/promises";
+import type { IncomingMessage } from "node:http";
+import { createServer } from "node:http";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { AuralisResponseError } from "./errors/auralis-response.error.ts";
 import { InternalServerError } from "./errors/internal-server-response.error.ts";
 import { NotFoundResponseError } from "./errors/not-found-response.error.ts";
@@ -59,7 +60,7 @@ export class Auralis {
     };
   }> = [];
 
-  async initialize() {
+  async initialize(): Promise<void> {
     // Load controllers so that their decorators are registered
     for await (const entry of glob("./**/*.controller.js", {
       withFileTypes: true,
@@ -128,7 +129,9 @@ export class Auralis {
     }
   }
 
-  async listen(port: number) {
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async listen(port: number): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const server = createServer(async (req, res) => {
       console.log("Request received:", req.method, req.url);
 
@@ -141,13 +144,13 @@ export class Auralis {
         if (handlerRef) {
           console.log("[Auralis]: Found handler for", req.url, handlerRef);
 
-          const parametersForHandler: any[] = [];
+          const parametersForHandler: unknown[] = [];
 
           // Extract path variables if they exist
           if (handlerRef.pathVariables) {
-            const regexPattern = handlerRef.path.replace(
+            const regexPattern = handlerRef.path.replaceAll(
               /:(\w+)/g,
-              (_, name) => `(?<${name}>[^/]+)`
+              (_, name) => `(?<${name as string}>[^/]+)`
             );
             const regex = new RegExp(regexPattern);
             const match = regex.exec(req.url!);
@@ -173,7 +176,7 @@ export class Auralis {
               let data = "";
               req
                 .on("data", (chunk) => {
-                  data += chunk;
+                  data += chunk as string;
                 })
                 .on("end", () => {
                   resolve(data);
@@ -199,7 +202,7 @@ export class Auralis {
           }
         } else {
           const notFoundResponse = new NotFoundResponseError(
-            `No handler found for ${req.method} ${req.url}`
+            `No handler found for ${req.method!} ${req.url!}`
           );
           notFoundResponse.handle(res);
         }
@@ -237,9 +240,9 @@ function pathMatches(path: string, req: IncomingMessage): boolean {
 
   // trim trailing slash
   const trimmedPath = path.replace(/\/$/, "");
-  const trimmedUrl = requestUrl?.replace(/\/$/, "");
+  const trimmedUrl = requestUrl.replace(/\/$/, "");
 
-  const regexPattern = "^" + trimmedPath.replace(/:(\w+)/g, "([^/]+)") + "$";
+  const regexPattern = `^${trimmedPath.replaceAll(/:(\w+)/g, "([^/]+)")}$`;
   const regex = new RegExp(regexPattern);
 
   return regex.test(trimmedUrl);

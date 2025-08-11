@@ -8,7 +8,7 @@ export function PathVariable(type = String): ParameterDecorator {
     const fn: Function = controller.prototype[propertyKey!];
 
     const paramNames = getParamNames(fn);
-    let paramName: string = paramNames[parameterIndex];
+    const paramName: string = paramNames[parameterIndex];
 
     if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
       Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});

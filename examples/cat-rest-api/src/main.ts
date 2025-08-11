@@ -7,4 +7,4 @@ async function bootstrap() {
   console.log("Auralis is running on http://localhost:4000");
 }
 
-bootstrap();
+await bootstrap();

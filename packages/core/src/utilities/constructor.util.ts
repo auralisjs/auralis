@@ -1,1 +1,1 @@
-export type Constructor<T = any> = new (init?: Partial<T>) => T;
+export type Constructor<T = unknown> = new (init?: Partial<T>) => T;
