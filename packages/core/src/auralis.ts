@@ -10,41 +10,42 @@ import type { Constructor } from "./utilities/constructor.util.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
-export class Auralis {
-  static [AURALIS_REGISTRY_SYMBOL]: Map<
-    Constructor,
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+interface HandlerMetadata {
+  name?: string;
+  method?: HttpMethod;
+  path?: string;
+  responseHeaders?: Record<string, string>;
+  pathVariables?: Map<
+    string,
     {
-      path?: string;
-      responseHeaders?: Record<string, string>;
-      handlers?: Map<
-        Function,
-        {
-          name?: string;
-          method?: "GET" | "POST" | "PUT" | "DELETE";
-          path?: string;
-          responseHeaders?: Record<string, string>;
-          pathVariables?: Map<
-            string,
-            {
-              type: Function;
-              index: number;
-            }
-          >;
-          requestBody?: {
-            paramName: string;
-            type: Constructor;
-            index: number;
-          };
-        }
-      >;
+      type: Function;
+      index: number;
     }
-  > = new Map();
+  >;
+  requestBody?: {
+    paramName: string;
+    type: Constructor;
+    index: number;
+  };
+}
+
+interface ControllerMetadata {
+  path?: string;
+  responseHeaders?: Record<string, string>;
+  handlers?: Map<Function, HandlerMetadata>;
+}
+
+export class Auralis {
+  static [AURALIS_REGISTRY_SYMBOL]: Map<Constructor, ControllerMetadata> =
+    new Map();
 
   #handlers: Array<{
     controller: Constructor;
     fn: Function;
     name: string;
-    method: "GET" | "POST" | "PUT" | "DELETE";
+    method: HttpMethod;
     path: string;
     responseHeaders?: Record<string, string>;
     pathVariables?: Map<
