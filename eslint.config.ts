@@ -3,6 +3,7 @@ import type { ConfigWithExtendsArray } from "@eslint/config-helpers";
 import { defineConfig } from "@eslint/config-helpers";
 import eslint from "@eslint/js";
 import stylistic from "@stylistic/eslint-plugin";
+import eslintPluginVitest from "@vitest/eslint-plugin";
 import { flatConfigs as eslintPluginImportX } from "eslint-plugin-import-x";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import eslintPluginUnicorn from "eslint-plugin-unicorn";
@@ -179,6 +180,42 @@ export default defineConfig(
 
       // TODO @Shinigami92 2025-08-11: Maybe enable later
       "unicorn/prevent-abbreviations": "off",
+    },
+  },
+  //#endregion
+
+  //#region overrides
+  {
+    name: "**/*.spec.ts overrides",
+    files: ["**/*.spec.ts", "**/*.spec.d.ts"],
+    plugins: {
+      vitest: eslintPluginVitest,
+    },
+    rules: {
+      "@typescript-eslint/no-deprecated": "off",
+
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        {
+          allowNumber: true,
+          allowBoolean: true,
+          allowAny: true,
+        },
+      ],
+
+      ...eslintPluginVitest.configs.recommended.rules,
+
+      "vitest/expect-expect": "off",
+      "vitest/no-alias-methods": "error",
+      "vitest/prefer-each": "error",
+      "vitest/prefer-to-have-length": "error",
+      "vitest/valid-expect": ["error", { maxArgs: 2 }],
+      "vitest/warn-todo": "warn",
+    },
+    settings: {
+      vitest: {
+        typecheck: true,
+      },
     },
   },
   //#endregion
