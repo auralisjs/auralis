@@ -23,6 +23,16 @@
     "type": "git",
     "url": "git+https://github.com/auralisjs/auralis.git"
   },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/Shinigami92"
+    },
+    {
+      "type": "paypal",
+      "url": "https://www.paypal.com/donate/?hosted_button_id=L7GY729FBKTZY"
+    }
+  ],
   "license": "MIT",
   "author": {
     "name": "Christopher Quadflieg",
