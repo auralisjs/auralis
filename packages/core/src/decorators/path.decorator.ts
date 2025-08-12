@@ -27,10 +27,12 @@ export function Path(path: string): MethodDecorator {
     handlerRef.name = propertyKey.toString();
     handlerRef.path = path;
 
-    console.log("[Path]:", {
-      args: [target, propertyKey, descriptor],
-      path,
-      controller,
-    });
+    if (process.env.AURALIS_DEBUG) {
+      console.debug("[Path]:", {
+        args: [target, propertyKey, descriptor],
+        path,
+        controller,
+      });
+    }
   };
 }

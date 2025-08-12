@@ -17,9 +17,11 @@ export function RestController(path: string): ClassDecorator {
     controllerRef.responseHeaders["Content-Type"] =
       "application/json; charset=utf-8";
 
-    console.log("[RestController]:", {
-      path,
-      controller,
-    });
+    if (process.env.AURALIS_DEBUG) {
+      console.debug("[RestController]:", {
+        path,
+        controller,
+      });
+    }
   };
 }

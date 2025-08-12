@@ -26,12 +26,14 @@ export function PathVariable(type = String): ParameterDecorator {
     handlerRef.pathVariables ??= new Map();
     handlerRef.pathVariables.set(paramName, { type, index: parameterIndex });
 
-    console.log("[PathVariable]:", {
-      owningClass: controller,
-      propertyKey,
-      parameterIndex,
-      type,
-      paramName,
-    });
+    if (process.env.AURALIS_DEBUG) {
+      console.debug("[PathVariable]:", {
+        owningClass: controller,
+        propertyKey,
+        parameterIndex,
+        type,
+        paramName,
+      });
+    }
   };
 }

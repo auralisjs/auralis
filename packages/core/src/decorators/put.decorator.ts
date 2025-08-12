@@ -19,9 +19,11 @@ export const Put: MethodDecorator = (target, propertyKey, descriptor) => {
   const handlerRef = controllerRef.handlers.get(fn)!;
   handlerRef.method = "PUT";
 
-  console.log("[Put]:", {
-    owningClass: controller,
-    propertyKey,
-    fn,
-  });
+  if (process.env.AURALIS_DEBUG) {
+    console.debug("[Put]:", {
+      owningClass: controller,
+      propertyKey,
+      fn,
+    });
+  }
 };
