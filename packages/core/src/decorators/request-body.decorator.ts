@@ -4,7 +4,7 @@ import { getParamNames } from "../utilities/param-names.util.ts";
 
 export function RequestBody(type: Constructor): ParameterDecorator {
   return function (target, propertyKey, parameterIndex) {
-    const controller = target.constructor;
+    const controller = target.constructor as unknown as Constructor;
 
     const fn: Function = controller.prototype[propertyKey!];
 

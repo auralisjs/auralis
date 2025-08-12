@@ -1,9 +1,10 @@
 import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
+import type { Constructor } from "../utilities/constructor.util.ts";
 import { getParamNames } from "../utilities/param-names.util.ts";
 
 export function PathVariable(type = String): ParameterDecorator {
   return function (target, propertyKey, parameterIndex) {
-    const controller = target.constructor;
+    const controller = target.constructor as unknown as Constructor;
 
     const fn: Function = controller.prototype[propertyKey!];
 

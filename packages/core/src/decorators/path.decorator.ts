@@ -1,8 +1,9 @@
 import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
+import type { Constructor } from "../utilities/constructor.util.ts";
 
 export function Path(path: string): MethodDecorator {
   return function (target, propertyKey, descriptor) {
-    const controller = target.constructor;
+    const controller = target.constructor as unknown as Constructor;
 
     if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
       Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});

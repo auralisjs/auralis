@@ -12,7 +12,7 @@ export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
 export class Auralis {
   static [AURALIS_REGISTRY_SYMBOL]: Map<
-    Function,
+    Constructor,
     {
       path?: string;
       responseHeaders?: Record<string, string>;
@@ -41,6 +41,7 @@ export class Auralis {
   > = new Map();
 
   #handlers: Array<{
+    controller: Constructor;
     fn: Function;
     name: string;
     method: "GET" | "POST" | "PUT" | "DELETE";
@@ -114,6 +115,7 @@ export class Auralis {
         }
 
         this.#handlers.push({
+          controller,
           fn: handler,
           name: handlerMetadata.name,
           method: handlerMetadata.method,
@@ -194,7 +196,10 @@ export class Auralis {
             }
           }
 
-          const responseBody = handlerRef.fn(...parametersForHandler);
+          const controllerInstance = new handlerRef.controller();
+          const boundFn = handlerRef.fn.bind(controllerInstance);
+
+          const responseBody = boundFn(...parametersForHandler);
           if (responseBody) {
             res.write(JSON.stringify(responseBody));
           } else {

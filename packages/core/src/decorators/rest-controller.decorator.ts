@@ -1,8 +1,9 @@
 import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
+import type { Constructor } from "../utilities/constructor.util.ts";
 
 export function RestController(path: string): ClassDecorator {
   return function (target) {
-    const controller = target;
+    const controller = target as unknown as Constructor;
 
     if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
       Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});
