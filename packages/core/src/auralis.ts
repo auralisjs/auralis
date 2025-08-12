@@ -67,13 +67,18 @@ export class Auralis {
     for await (const entry of glob("./**/*.controller.js", {
       withFileTypes: true,
     })) {
-      console.log("Loading controller:", entry.name);
+      if (process.env.AURALIS_DEBUG) {
+        console.debug("[Auralis] Loading controller:", entry.name);
+      }
+
       await import(pathToFileURL(resolve(entry.parentPath, entry.name)).href);
     }
 
-    console.dir(Auralis[AURALIS_REGISTRY_SYMBOL], {
-      depth: Number.POSITIVE_INFINITY,
-    });
+    if (process.env.AURALIS_DEBUG) {
+      console.dir(Auralis[AURALIS_REGISTRY_SYMBOL], {
+        depth: Number.POSITIVE_INFINITY,
+      });
+    }
 
     for (const [controller, controllerMetadata] of Auralis[
       AURALIS_REGISTRY_SYMBOL
@@ -136,7 +141,9 @@ export class Auralis {
   async listen(port: number): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     const server = createServer(async (req, res) => {
-      console.log("Request received:", req.method, req.url);
+      if (process.env.AURALIS_DEBUG) {
+        console.debug("[Auralis] Request received:", req.method, req.url);
+      }
 
       try {
         const handlerRef = this.#handlers.find(
@@ -145,7 +152,9 @@ export class Auralis {
         );
 
         if (handlerRef) {
-          console.log("[Auralis]: Found handler for", req.url, handlerRef);
+          if (process.env.AURALIS_DEBUG) {
+            console.debug("[Auralis]: Found handler for", req.method, req.url);
+          }
 
           const parametersForHandler: unknown[] = [];
 
@@ -159,7 +168,9 @@ export class Auralis {
             const match = regex.exec(req.url!);
 
             if (match) {
-              console.log("[Auralis]: Extracted path variables", match);
+              if (process.env.AURALIS_DEBUG) {
+                console.debug("[Auralis]: Extracted path variables", match);
+              }
 
               for (const [
                 pathVariableName,
@@ -232,7 +243,9 @@ export class Auralis {
 }
 
 function pathMatches(path: string, req: IncomingMessage): boolean {
-  // console.log("[pathMatches]: tries to match", path, "with", req.url);
+  if (process.env.AURALIS_DEBUG) {
+    // console.debug("[pathMatches]: tries to match", path, "with", req.url);
+  }
 
   const requestUrl = req.url;
 

@@ -29,12 +29,14 @@ export function RequestBody(type: Constructor): ParameterDecorator {
       index: parameterIndex,
     };
 
-    console.log("[RequestBody]:", {
-      owningClass: controller,
-      propertyKey,
-      parameterIndex,
-      type,
-      paramName,
-    });
+    if (process.env.AURALIS_DEBUG) {
+      console.debug("[RequestBody]:", {
+        owningClass: controller,
+        propertyKey,
+        parameterIndex,
+        type,
+        paramName,
+      });
+    }
   };
 }

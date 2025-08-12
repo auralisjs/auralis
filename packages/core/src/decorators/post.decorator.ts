@@ -19,9 +19,11 @@ export const Post: MethodDecorator = (target, propertyKey, descriptor) => {
   const handlerRef = controllerRef.handlers.get(fn)!;
   handlerRef.method = "POST";
 
-  console.log("[Post]:", {
-    owningClass: controller,
-    propertyKey,
-    fn,
-  });
+  if (process.env.AURALIS_DEBUG) {
+    console.debug("[Post]:", {
+      owningClass: controller,
+      propertyKey,
+      fn,
+    });
+  }
 };

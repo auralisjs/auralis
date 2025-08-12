@@ -19,9 +19,11 @@ export const Delete: MethodDecorator = (target, propertyKey, descriptor) => {
   const handlerRef = controllerRef.handlers.get(fn)!;
   handlerRef.method = "DELETE";
 
-  console.log("[Delete]:", {
-    owningClass: controller,
-    propertyKey,
-    fn,
-  });
+  if (process.env.AURALIS_DEBUG) {
+    console.debug("[Delete]:", {
+      owningClass: controller,
+      propertyKey,
+      fn,
+    });
+  }
 };

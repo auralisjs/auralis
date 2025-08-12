@@ -19,9 +19,11 @@ export const Get: MethodDecorator = (target, propertyKey, descriptor) => {
   const handlerRef = controllerRef.handlers.get(fn)!;
   handlerRef.method = "GET";
 
-  console.log("[Get]:", {
-    owningClass: controller,
-    propertyKey,
-    fn,
-  });
+  if (process.env.AURALIS_DEBUG) {
+    console.debug("[Get]:", {
+      owningClass: controller,
+      propertyKey,
+      fn,
+    });
+  }
 };
