@@ -2,7 +2,6 @@ import {
   Delete,
   Get,
   NotFoundResponseError,
-  Path,
   PathVariable,
   Post,
   Put,
@@ -19,14 +18,12 @@ const cats: Cat[] = [
 
 @RestController("/cats")
 export class CatController {
-  @Get
-  @Path("/")
+  @Get("/")
   public list(): Cat[] {
     return cats;
   }
 
-  @Get
-  @Path("/:id")
+  @Get("/:id")
   public getById(@PathVariable() id: UUID): Cat | null {
     const foundCat = cats.find((cat) => cat.id === id);
 
@@ -37,16 +34,14 @@ export class CatController {
     return foundCat;
   }
 
-  @Post
-  @Path("/")
+  @Post("/")
   public create(@RequestBody(Cat) cat: Cat): Cat {
     cat.id = randomUUID();
     cats.push(cat);
     return cat;
   }
 
-  @Put
-  @Path("/:id")
+  @Put("/:id")
   public update(@PathVariable() id: UUID, @RequestBody(Cat) cat: Cat): Cat {
     const index = cats.findIndex((c) => c.id === id);
     if (index === -1) {
@@ -57,8 +52,7 @@ export class CatController {
     return cat;
   }
 
-  @Delete
-  @Path("/:id")
+  @Delete("/:id")
   public delete(@PathVariable() id: UUID): void {
     const index = cats.findIndex((c) => c.id === id);
     if (index === -1) {
