@@ -223,7 +223,9 @@ export class Auralis {
           notFoundResponse.handle(res);
         }
       } catch (error) {
-        console.error("[Auralis]: Error handling request", error);
+        if (process.env.AURALIS_DEBUG) {
+          console.error("[Auralis]: Error handling request", error);
+        }
 
         if (error instanceof AuralisResponseError) {
           error.handle(res);

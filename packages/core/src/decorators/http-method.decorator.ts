@@ -11,7 +11,7 @@ export type HttpMethod =
   | "OPTIONS"
   | "PATCH";
 
-export function HttpMethod(method: HttpMethod): MethodDecorator {
+export function HttpMethod(method: HttpMethod, path: string): MethodDecorator {
   return (target, propertyKey, descriptor) => {
     const controller = (
       typeof target === "function" ? target : target.constructor
@@ -30,13 +30,16 @@ export function HttpMethod(method: HttpMethod): MethodDecorator {
     }
 
     const handlerRef = controllerRef.handlers.get(fn)!;
+    handlerRef.name = propertyKey.toString();
     handlerRef.method = method;
+    handlerRef.path = path;
 
     if (process.env.AURALIS_DEBUG) {
       console.debug(`[${method}]:`, {
-        owningClass: controller,
-        propertyKey,
+        args: [target, propertyKey, descriptor],
+        controller,
         fn,
+        path,
       });
     }
   };

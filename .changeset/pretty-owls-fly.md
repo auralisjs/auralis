@@ -2,4 +2,4 @@
 "@auralis/core": minor
 ---
 
-feat: add @HttpMethod
+feat: add `@HttpMethod` decorators
