@@ -234,7 +234,9 @@ export class Auralis {
         }
       }
 
-      res.end();
+      if (!res.writableEnded) {
+        res.end();
+      }
     });
 
     server.listen(port);
