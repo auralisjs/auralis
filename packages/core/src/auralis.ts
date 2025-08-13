@@ -3,14 +3,13 @@ import type { IncomingMessage } from "node:http";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import type { HttpMethod } from "./decorators/http-method.decorator.ts";
 import { AuralisResponseError } from "./errors/auralis-response.error.ts";
 import { InternalServerError } from "./errors/internal-server-response.error.ts";
 import { NotFoundResponseError } from "./errors/not-found-response.error.ts";
 import type { Constructor } from "./utilities/constructor.util.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
-
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 interface HandlerMetadata {
   name?: string;
