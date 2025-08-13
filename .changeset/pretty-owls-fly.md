@@ -1,5 +1,5 @@
 ---
-"@auralis/core": patch
+"@auralis/core": minor
 ---
 
 feat: add @HttpMethod
