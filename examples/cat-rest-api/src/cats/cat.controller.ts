@@ -28,7 +28,13 @@ export class CatController {
   @Get
   @Path("/:id")
   public getById(@PathVariable() id: UUID): Cat | null {
-    return cats.find((cat) => cat.id === id) ?? null;
+    const foundCat = cats.find((cat) => cat.id === id);
+
+    if (!foundCat) {
+      throw new NotFoundResponseError("Cat not found");
+    }
+
+    return foundCat;
   }
 
   @Post

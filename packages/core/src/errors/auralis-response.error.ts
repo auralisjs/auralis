@@ -18,6 +18,5 @@ export abstract class AuralisResponseError extends Error {
         statusCode: this.statusCode,
       })
     );
-    res.end();
   }
 }

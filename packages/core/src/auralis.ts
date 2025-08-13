@@ -210,7 +210,7 @@ export class Auralis {
           const controllerInstance = new handlerRef.controller();
           const boundFn = handlerRef.fn.bind(controllerInstance);
 
-          const responseBody = boundFn(...parametersForHandler);
+          const responseBody = await boundFn(...parametersForHandler);
           if (responseBody) {
             res.write(JSON.stringify(responseBody));
           } else {
@@ -234,7 +234,9 @@ export class Auralis {
         }
       }
 
-      res.end();
+      if (!res.writableEnded) {
+        res.end();
+      }
     });
 
     server.listen(port);
