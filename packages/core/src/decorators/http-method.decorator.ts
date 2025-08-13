@@ -13,8 +13,10 @@ export type HttpMethod =
 
 export function HttpMethod(method: HttpMethod): MethodDecorator {
   return (target, propertyKey, descriptor) => {
-    const controller = target.constructor as unknown as Constructor;
-    const fn = descriptor.value as Function;
+    const controller = (
+      typeof target === "function" ? target : target.constructor
+    ) as Constructor;
+    const fn = descriptor.value as (...args: unknown[]) => unknown;
 
     if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
       Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});
