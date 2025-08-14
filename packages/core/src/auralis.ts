@@ -28,6 +28,14 @@ interface HandlerMetadata {
     type: Constructor;
     index: number;
   };
+  passRequest?: {
+    paramName: string;
+    index: number;
+  };
+  passResponse?: {
+    paramName: string;
+    index: number;
+  };
 }
 
 interface ControllerMetadata {
@@ -57,6 +65,14 @@ export class Auralis {
     requestBody?: {
       paramName: string;
       type: Constructor;
+      index: number;
+    };
+    passRequest?: {
+      paramName: string;
+      index: number;
+    };
+    passResponse?: {
+      paramName: string;
       index: number;
     };
   }> = [];
@@ -131,6 +147,8 @@ export class Auralis {
           },
           pathVariables: handlerMetadata.pathVariables,
           requestBody: handlerMetadata.requestBody,
+          passRequest: handlerMetadata.passRequest,
+          passResponse: handlerMetadata.passResponse,
         });
       }
     }
@@ -205,6 +223,16 @@ export class Auralis {
             )) {
               res.setHeader(name, value);
             }
+          }
+
+          if (handlerRef.passRequest) {
+            const { index } = handlerRef.passRequest;
+            parametersForHandler[index] = req;
+          }
+
+          if (handlerRef.passResponse) {
+            const { index } = handlerRef.passResponse;
+            parametersForHandler[index] = res;
           }
 
           const controllerInstance = new handlerRef.controller();
