@@ -1,5 +1,13 @@
 # @auralis/core
 
+## 0.3.0
+
+### Minor Changes
+
+- [#15](https://github.com/auralisjs/auralis/pull/15) [`5bad5ba`](https://github.com/auralisjs/auralis/commit/5bad5ba111064fa74770ee988a3c913fb25432be) Thanks [@Shinigami92](https://github.com/Shinigami92)! - feat: add `@Request` and `@Response` decorators
+
+- [#13](https://github.com/auralisjs/auralis/pull/13) [`3408dde`](https://github.com/auralisjs/auralis/commit/3408ddeb73d3ad496720f29896466efb39630052) Thanks [@Shinigami92](https://github.com/Shinigami92)! - feat: add `@Patch` decorator
+
 ## 0.2.0
 
 ### Minor Changes
