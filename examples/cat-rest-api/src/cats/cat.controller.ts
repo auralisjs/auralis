@@ -2,6 +2,7 @@ import {
   Delete,
   Get,
   NotFoundResponseError,
+  Patch,
   PathVariable,
   Post,
   Put,
@@ -24,7 +25,7 @@ export class CatController {
   }
 
   @Get("/:id")
-  public getById(@PathVariable() id: UUID): Cat | null {
+  public getById(@PathVariable() id: UUID): Cat {
     const foundCat = cats.find((cat) => cat.id === id);
 
     if (!foundCat) {
@@ -43,13 +44,29 @@ export class CatController {
 
   @Put("/:id")
   public update(@PathVariable() id: UUID, @RequestBody(Cat) cat: Cat): Cat {
-    const index = cats.findIndex((c) => c.id === id);
-    if (index === -1) {
+    const foundCat = cats.find((c) => c.id === id);
+    if (!foundCat) {
       throw new NotFoundResponseError("Cat not found");
     }
 
-    cats[index] = cat;
-    return cat;
+    Object.assign(foundCat, cat);
+    foundCat.id = id; // Ensure the ID remains the same
+    return foundCat;
+  }
+
+  @Patch("/:id")
+  public partialUpdate(
+    @PathVariable() id: UUID,
+    @RequestBody(Cat) cat: Partial<Cat>
+  ): Cat {
+    const foundCat = cats.find((c) => c.id === id);
+    if (!foundCat) {
+      throw new NotFoundResponseError("Cat not found");
+    }
+
+    Object.assign(foundCat, cat);
+    foundCat.id = id; // Ensure the ID remains the same
+    return foundCat;
   }
 
   @Delete("/:id")
