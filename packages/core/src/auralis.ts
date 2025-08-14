@@ -239,9 +239,12 @@ export class Auralis {
           const boundFn = handlerRef.fn.bind(controllerInstance);
 
           const responseBody = await boundFn(...parametersForHandler);
-          if (responseBody) {
+
+          if (!res.writableEnded && responseBody) {
             res.write(JSON.stringify(responseBody));
-          } else {
+          }
+
+          if (!res.headersSent && responseBody === void 0) {
             res.statusCode = 204;
           }
         } else {
