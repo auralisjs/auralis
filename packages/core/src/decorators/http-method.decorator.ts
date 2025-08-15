@@ -1,5 +1,5 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 import type { Constructor } from "../utilities/constructor.util.ts";
+import { ensureHandlerRef } from "../utilities/registry.util.ts";
 
 export type HttpMethod =
   | "GET"
@@ -18,18 +18,8 @@ export function HttpMethod(method: HttpMethod, path: string): MethodDecorator {
     ) as Constructor;
     const fn = descriptor.value as (...args: unknown[]) => unknown;
 
-    if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
-      Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});
-    }
+    const { handlerRef } = ensureHandlerRef(controller, fn);
 
-    const controllerRef = Auralis[AURALIS_REGISTRY_SYMBOL].get(controller)!;
-    controllerRef.handlers ??= new Map();
-
-    if (!controllerRef.handlers.has(fn)) {
-      controllerRef.handlers.set(fn, {});
-    }
-
-    const handlerRef = controllerRef.handlers.get(fn)!;
     handlerRef.name = propertyKey.toString();
     handlerRef.method = method;
     handlerRef.path = path;

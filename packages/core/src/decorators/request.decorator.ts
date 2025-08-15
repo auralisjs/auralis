@@ -1,6 +1,6 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 import type { Constructor } from "../utilities/constructor.util.ts";
 import { getParamNames } from "../utilities/param-names.util.ts";
+import { ensureHandlerRef } from "../utilities/registry.util.ts";
 
 export const Request: ParameterDecorator = (
   target,
@@ -14,18 +14,8 @@ export const Request: ParameterDecorator = (
   const paramNames = getParamNames(fn);
   const paramName: string = paramNames[parameterIndex];
 
-  if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
-    Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});
-  }
+  const { handlerRef } = ensureHandlerRef(controller, fn);
 
-  const controllerRef = Auralis[AURALIS_REGISTRY_SYMBOL].get(controller)!;
-  controllerRef.handlers ??= new Map();
-
-  if (!controllerRef.handlers.has(fn)) {
-    controllerRef.handlers.set(fn, {});
-  }
-
-  const handlerRef = controllerRef.handlers.get(fn)!;
   handlerRef.passRequest = {
     paramName,
     index: parameterIndex,
@@ -33,9 +23,9 @@ export const Request: ParameterDecorator = (
 
   if (process.env.AURALIS_DEBUG) {
     console.debug("[Request]:", {
+      args: [target, propertyKey, parameterIndex],
       controller,
-      propertyKey,
-      parameterIndex,
+      fn,
       paramName,
     });
   }

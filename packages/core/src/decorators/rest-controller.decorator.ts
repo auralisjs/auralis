@@ -1,15 +1,11 @@
-import { Auralis, AURALIS_REGISTRY_SYMBOL } from "../auralis.ts";
 import type { Constructor } from "../utilities/constructor.util.ts";
+import { ensureControllerRef } from "../utilities/registry.util.ts";
 
 export function RestController(path: string): ClassDecorator {
   return function (target) {
     const controller = target as unknown as Constructor;
 
-    if (!Auralis[AURALIS_REGISTRY_SYMBOL].has(controller)) {
-      Auralis[AURALIS_REGISTRY_SYMBOL].set(controller, {});
-    }
-
-    const controllerRef = Auralis[AURALIS_REGISTRY_SYMBOL].get(controller)!;
+    const controllerRef = ensureControllerRef(controller);
 
     // TODO @Shinigami92 2025-08-11: Is `args[0].name` needed?
     controllerRef.path = path;
@@ -19,8 +15,9 @@ export function RestController(path: string): ClassDecorator {
 
     if (process.env.AURALIS_DEBUG) {
       console.debug("[RestController]:", {
-        path,
+        args: [target],
         controller,
+        path,
       });
     }
   };
