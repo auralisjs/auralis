@@ -1,5 +1,11 @@
 # @auralis/core
 
+## 0.4.0
+
+### Minor Changes
+
+- [#18](https://github.com/auralisjs/auralis/pull/18) [`3e9cca0`](https://github.com/auralisjs/auralis/commit/3e9cca07abaafc7a6306f9403a450548d8d9aa56) Thanks [@Shinigami92](https://github.com/Shinigami92)! - feat: add `getUrl` method
+
 ## 0.3.0
 
 ### Minor Changes
