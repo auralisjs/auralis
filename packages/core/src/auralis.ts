@@ -11,7 +11,7 @@ import type { Constructor } from "./utilities/constructor.util.ts";
 
 export const AURALIS_REGISTRY_SYMBOL = Symbol("auralis:registry");
 
-interface HandlerMetadata {
+export interface HandlerMetadata {
   name?: string;
   method?: HttpMethod;
   path?: string;
@@ -38,7 +38,7 @@ interface HandlerMetadata {
   };
 }
 
-interface ControllerMetadata {
+export interface ControllerMetadata {
   path?: string;
   responseHeaders?: Record<string, string>;
   handlers?: Map<Function, HandlerMetadata>;
