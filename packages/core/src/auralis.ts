@@ -1,5 +1,5 @@
 import { glob } from "node:fs/promises";
-import type { IncomingMessage } from "node:http";
+import type { IncomingMessage, Server } from "node:http";
 import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -76,6 +76,8 @@ export class Auralis {
       index: number;
     };
   }> = [];
+
+  #server?: Server;
 
   async initialize(): Promise<void> {
     // Load controllers so that their decorators are registered
@@ -157,7 +159,7 @@ export class Auralis {
   // eslint-disable-next-line @typescript-eslint/require-await
   async listen(port: number): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    const server = createServer(async (req, res) => {
+    this.#server = createServer(async (req, res) => {
       if (process.env.AURALIS_DEBUG) {
         console.debug("[Auralis] Request received:", req.method, req.url);
       }
@@ -272,7 +274,29 @@ export class Auralis {
       }
     });
 
-    server.listen(port);
+    this.#server.listen(port);
+  }
+
+  getUrl(): string {
+    if (!this.#server) {
+      throw new Error("Server is not running");
+    }
+
+    const address = this.#server.address();
+
+    if (!address) {
+      throw new Error("Server is not running");
+    }
+
+    if (typeof address === "string") {
+      return address;
+    }
+
+    if (address.family === "IPv6") {
+      return `http://[${address.address}]:${address.port.toString()}`;
+    }
+
+    return `http://${address.address}:${address.port.toString()}`;
   }
 }
 
