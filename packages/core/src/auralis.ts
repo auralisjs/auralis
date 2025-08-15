@@ -292,11 +292,16 @@ export class Auralis {
       return address;
     }
 
-    if (address.family === "IPv6") {
-      return `http://[${address.address}]:${address.port.toString()}`;
+    // Map unspecified addresses to localhost for ergonomics
+    const isUnspecified =
+      address.address === "::" || address.address === "0.0.0.0";
+    const host = isUnspecified ? "localhost" : address.address;
+
+    if (address.family === "IPv6" && !isUnspecified) {
+      return `http://[${host}]:${address.port.toString()}`;
     }
 
-    return `http://${address.address}:${address.port.toString()}`;
+    return `http://${host}:${address.port.toString()}`;
   }
 }
 
