@@ -1,5 +1,11 @@
 # @auralis/core
 
+## 0.5.0
+
+### Minor Changes
+
+- [#20](https://github.com/auralisjs/auralis/pull/20) [`52aee5b`](https://github.com/auralisjs/auralis/commit/52aee5b67113532a73674dcd357aaafb54c6ccfa) Thanks [@Shinigami92](https://github.com/Shinigami92)! - feat: expose `server` for testing
+
 ## 0.4.0
 
 ### Minor Changes
