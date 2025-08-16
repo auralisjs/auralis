@@ -1,6 +1,7 @@
 import { glob } from "node:fs/promises";
-import type { IncomingMessage, Server } from "node:http";
+import type { IncomingMessage } from "node:http";
 import { createServer } from "node:http";
+import type { Server } from "node:net";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { HttpMethod } from "./decorators/http-method.decorator.ts";
@@ -79,6 +80,14 @@ export class Auralis {
 
   #server?: Server;
 
+  get server(): Server {
+    if (!this.#server) {
+      throw new Error("[Auralis]: Server is not initialized");
+    }
+
+    return this.#server;
+  }
+
   async initialize(): Promise<void> {
     // Load controllers so that their decorators are registered
     for await (const entry of glob("./**/*.controller.js", {
@@ -154,10 +163,11 @@ export class Auralis {
         });
       }
     }
+
+    this.#initServer();
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  async listen(port: number): Promise<void> {
+  #initServer(): void {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.#server = createServer(async (req, res) => {
       if (process.env.AURALIS_DEBUG) {
@@ -273,8 +283,11 @@ export class Auralis {
         res.end();
       }
     });
+  }
 
-    this.#server.listen(port);
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async listen(port: number): Promise<void> {
+    this.#server?.listen(port);
   }
 
   getUrl(): string {

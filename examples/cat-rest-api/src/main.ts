@@ -1,8 +1,6 @@
-import { AuralisFactory } from "@auralis/core";
+import { app } from "./app.ts";
 
 async function bootstrap() {
-  const app = await AuralisFactory.create();
-
   await app.listen(4115);
   console.log(`Auralis is running on ${app.getUrl()}`);
 }
