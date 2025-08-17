@@ -7,7 +7,7 @@
     "verbatimModuleSyntax": true,
     "strict": true,
     "experimentalDecorators": true,
-    "outDir": "./dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": true
   }
 }

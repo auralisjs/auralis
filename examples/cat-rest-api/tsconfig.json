@@ -1,12 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2024",
-    "module": "node20",
-    "rewriteRelativeImportExtensions": true,
-    "erasableSyntaxOnly": true,
-    "verbatimModuleSyntax": true,
-    "strict": true,
-    "experimentalDecorators": true,
+    "noEmit": false,
     "outDir": "./dist"
   }
 }
