@@ -18,14 +18,14 @@ describe("CatController /cats", () => {
 
   it("POST /", async () => {
     const response = await supertest(app.server).post("/cats").send({
-      name: "Mr Kettles",
+      name: "Mr Kittles",
       age: 5,
     });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       id: expect.any(String),
-      name: "Mr Kettles",
+      name: "Mr Kittles",
       age: 5,
     });
   });

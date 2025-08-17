@@ -1,3 +1,7 @@
 import { AuralisFactory } from "@auralis/core";
+import { OpenAPI } from "@auralis/openapi";
 
-export const app = await AuralisFactory.create();
+const app = await AuralisFactory.create();
+app.use(OpenAPI, {});
+
+export { app };

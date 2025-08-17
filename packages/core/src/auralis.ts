@@ -1,9 +1,10 @@
 import { glob } from "node:fs/promises";
-import type { IncomingMessage } from "node:http";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { createServer } from "node:http";
 import type { Server } from "node:net";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import type { AuralisPlugin } from "./auralis.plugin.ts";
 import type { HttpMethod } from "./decorators/http-method.decorator.ts";
 import { AuralisResponseError } from "./errors/auralis-response.error.ts";
 import { InternalServerError } from "./errors/internal-server-response.error.ts";
@@ -45,40 +46,55 @@ export interface ControllerMetadata {
   handlers?: Map<Function, HandlerMetadata>;
 }
 
+interface AuralisControllerHandler {
+  controller: Constructor;
+  fn: Function;
+  name: string;
+  method: HttpMethod;
+  path: string;
+  responseHeaders?: Record<string, string>;
+  pathVariables?: Map<
+    string,
+    {
+      type: Function;
+      index: number;
+    }
+  >;
+  requestBody?: {
+    paramName: string;
+    type: Constructor;
+    index: number;
+  };
+  passRequest?: {
+    paramName: string;
+    index: number;
+  };
+  passResponse?: {
+    paramName: string;
+    index: number;
+  };
+}
+
+export interface AuralisPluginHandler {
+  name: string;
+  method: HttpMethod;
+  path: string;
+  fn: (req: IncomingMessage, res: ServerResponse) => Promise<void> | void;
+}
+
+export type AuralisHandler = AuralisControllerHandler | AuralisPluginHandler;
+
 export class Auralis {
   static [AURALIS_REGISTRY_SYMBOL]: Map<Constructor, ControllerMetadata> =
     new Map();
 
-  #handlers: Array<{
-    controller: Constructor;
-    fn: Function;
-    name: string;
-    method: HttpMethod;
-    path: string;
-    responseHeaders?: Record<string, string>;
-    pathVariables?: Map<
-      string,
-      {
-        type: Function;
-        index: number;
-      }
-    >;
-    requestBody?: {
-      paramName: string;
-      type: Constructor;
-      index: number;
-    };
-    passRequest?: {
-      paramName: string;
-      index: number;
-    };
-    passResponse?: {
-      paramName: string;
-      index: number;
-    };
-  }> = [];
+  #handlers: AuralisHandler[] = [];
 
   #server?: Server;
+
+  get handlers(): ReadonlyArray<AuralisHandler> {
+    return this.#handlers;
+  }
 
   get server(): Server {
     if (!this.#server) {
@@ -185,79 +201,83 @@ export class Auralis {
             console.debug("[Auralis]: Found handler for", req.method, req.url);
           }
 
-          const parametersForHandler: unknown[] = [];
+          if ("controller" in handlerRef) {
+            const parametersForHandler: unknown[] = [];
 
-          // Extract path variables if they exist
-          if (handlerRef.pathVariables) {
-            const regexPattern = handlerRef.path.replaceAll(
-              /:(\w+)/g,
-              (_, name) => `(?<${name as string}>[^/]+)`
-            );
-            const regex = new RegExp(regexPattern);
-            const match = regex.exec(req.url!);
+            // Extract path variables if they exist
+            if (handlerRef.pathVariables) {
+              const regexPattern = handlerRef.path.replaceAll(
+                /:(\w+)/g,
+                (_, name) => `(?<${name as string}>[^/]+)`
+              );
+              const regex = new RegExp(regexPattern);
+              const match = regex.exec(req.url!);
 
-            if (match) {
-              if (process.env.AURALIS_DEBUG) {
-                console.debug("[Auralis]: Extracted path variables", match);
-              }
+              if (match) {
+                if (process.env.AURALIS_DEBUG) {
+                  console.debug("[Auralis]: Extracted path variables", match);
+                }
 
-              for (const [
-                pathVariableName,
-                pathVariableRef,
-              ] of handlerRef.pathVariables) {
-                parametersForHandler[pathVariableRef.index] =
-                  pathVariableRef.type(match.groups![pathVariableName]);
+                for (const [
+                  pathVariableName,
+                  pathVariableRef,
+                ] of handlerRef.pathVariables) {
+                  parametersForHandler[pathVariableRef.index] =
+                    pathVariableRef.type(match.groups![pathVariableName]);
+                }
               }
             }
-          }
 
-          // Extract request body if it exists
-          if (handlerRef.requestBody) {
-            const { type, index } = handlerRef.requestBody;
+            // Extract request body if it exists
+            if (handlerRef.requestBody) {
+              const { type, index } = handlerRef.requestBody;
 
-            const rawBody = await new Promise<string>((resolve) => {
-              let data = "";
-              req
-                .on("data", (chunk) => {
-                  data += chunk as string;
-                })
-                .on("end", () => {
-                  resolve(data);
-                });
-            });
+              const rawBody = await new Promise<string>((resolve) => {
+                let data = "";
+                req
+                  .on("data", (chunk) => {
+                    data += chunk as string;
+                  })
+                  .on("end", () => {
+                    resolve(data);
+                  });
+              });
 
-            parametersForHandler[index] = new type(JSON.parse(rawBody));
-          }
-
-          if (handlerRef.responseHeaders) {
-            for (const [name, value] of Object.entries(
-              handlerRef.responseHeaders
-            )) {
-              res.setHeader(name, value);
+              parametersForHandler[index] = new type(JSON.parse(rawBody));
             }
-          }
 
-          if (handlerRef.passRequest) {
-            const { index } = handlerRef.passRequest;
-            parametersForHandler[index] = req;
-          }
+            if (handlerRef.responseHeaders) {
+              for (const [name, value] of Object.entries(
+                handlerRef.responseHeaders
+              )) {
+                res.setHeader(name, value);
+              }
+            }
 
-          if (handlerRef.passResponse) {
-            const { index } = handlerRef.passResponse;
-            parametersForHandler[index] = res;
-          }
+            if (handlerRef.passRequest) {
+              const { index } = handlerRef.passRequest;
+              parametersForHandler[index] = req;
+            }
 
-          const controllerInstance = new handlerRef.controller();
-          const boundFn = handlerRef.fn.bind(controllerInstance);
+            if (handlerRef.passResponse) {
+              const { index } = handlerRef.passResponse;
+              parametersForHandler[index] = res;
+            }
 
-          const responseBody = await boundFn(...parametersForHandler);
+            const controllerInstance = new handlerRef.controller();
+            const boundFn = handlerRef.fn.bind(controllerInstance);
 
-          if (!res.writableEnded && responseBody) {
-            res.write(JSON.stringify(responseBody));
-          }
+            const responseBody = await boundFn(...parametersForHandler);
 
-          if (!res.headersSent && responseBody === void 0) {
-            res.statusCode = 204;
+            if (!res.writableEnded && responseBody) {
+              res.write(JSON.stringify(responseBody));
+            }
+
+            if (!res.headersSent && responseBody === void 0) {
+              res.statusCode = 204;
+            }
+          } else {
+            await handlerRef.fn(req, res);
           }
         } else {
           const notFoundResponse = new NotFoundResponseError(
@@ -283,6 +303,18 @@ export class Auralis {
         res.end();
       }
     });
+  }
+
+  use<TPluginOptions extends object>(
+    plugin: AuralisPlugin<TPluginOptions>,
+    options?: TPluginOptions
+  ): this {
+    if (process.env.AURALIS_DEBUG) {
+      console.debug("[Auralis] Using plugin:", plugin.name);
+    }
+
+    plugin.register(this, options);
+    return this;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
@@ -315,6 +347,19 @@ export class Auralis {
     }
 
     return `http://${host}:${address.port.toString()}`;
+  }
+
+  addPluginHandler(
+    metadata: Pick<AuralisPluginHandler, "name" | "method" | "path">,
+    fn: AuralisPluginHandler["fn"]
+  ): this {
+    this.#handlers.push({
+      name: metadata.name,
+      method: metadata.method,
+      path: metadata.path,
+      fn,
+    });
+    return this;
   }
 }
 
