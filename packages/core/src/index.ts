@@ -1,4 +1,5 @@
 export type { Auralis } from "./auralis.ts";
+export { Controller } from "./decorators/controller.decorator.ts";
 export { Delete } from "./decorators/delete.decorator.ts";
 export { Get } from "./decorators/get.decorator.ts";
 export { HttpMethod } from "./decorators/http-method.decorator.ts";

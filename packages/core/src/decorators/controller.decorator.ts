@@ -2,28 +2,25 @@ import type { Constructor } from "../utilities/constructor.util.ts";
 import { ensureControllerRef } from "../utilities/registry.util.ts";
 
 /**
- * REST controller decorator for defining a RESTful controller class.
+ * Controller decorator for defining a controller class.
  *
- * This decorator applies the `Content-Type: application/json; charset=utf-8` response header.
+ * This decorator does not apply response headers.
  *
  * @param path The base path for the controller that usually starts with a slash.
  *
- * @see `Controller` if you want to create a basic controller that does not apply response headers.
+ * @see `RestController` if you want to create a RESTful controller.
  */
-export function RestController(path: string): ClassDecorator {
+export function Controller(path: string): ClassDecorator {
   return function (target) {
     const controller = target as unknown as Constructor;
 
     const controllerRef = ensureControllerRef(controller);
 
-    // TODO @Shinigami92 2025-08-11: Is `args[0].name` needed?
     controllerRef.path = path;
     controllerRef.responseHeaders ??= {};
-    controllerRef.responseHeaders["Content-Type"] =
-      "application/json; charset=utf-8";
 
     if (process.env.AURALIS_DEBUG) {
-      console.debug("[RestController]:", {
+      console.debug("[Controller]:", {
         args: [target],
         controller,
         path,
