@@ -1,5 +1,11 @@
 # @auralis/core
 
+## 0.6.0
+
+### Minor Changes
+
+- [#23](https://github.com/auralisjs/auralis/pull/23) [`f5b8ba3`](https://github.com/auralisjs/auralis/commit/f5b8ba3f5c825537ada438a4dd0814fdfd35a059) Thanks [@Shinigami92](https://github.com/Shinigami92)! - feat: add `@Controller` decorator
+
 ## 0.5.0
 
 ### Minor Changes
