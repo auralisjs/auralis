@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types:
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,6 +37,10 @@ jobs:
           node-version: lts/*
           cache: pnpm
 
+      # Ensure npm 11.5.1 or later is installed
+      - name: Update npm
+        run: npm install -g npm@latest
+
       - name: Install Dependencies
         run: pnpm install
 
@@ -46,5 +53,3 @@ jobs:
           publish: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: true
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
