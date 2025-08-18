@@ -12,7 +12,8 @@
   "type": "module",
   "module": "./dist/main.js",
   "dependencies": {
-    "@auralis/core": "workspace:*"
+    "@auralis/core": "workspace:*",
+    "@auralis/openapi": "workspace:*"
   },
   "devDependencies": {
     "@types/supertest": "6.0.3",

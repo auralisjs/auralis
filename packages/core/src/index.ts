@@ -1,3 +1,5 @@
+export { definePlugin } from "./auralis.plugin.ts";
+export type { AuralisPlugin } from "./auralis.plugin.ts";
 export type { Auralis } from "./auralis.ts";
 export { Controller } from "./decorators/controller.decorator.ts";
 export { Delete } from "./decorators/delete.decorator.ts";
